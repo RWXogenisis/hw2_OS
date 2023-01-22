@@ -5,8 +5,6 @@
 #include <sys/wait.h>
 
 void child(char* options[]){
-    // can use execlp but need individual strings to mention the params
-    //printf("%s\n", options[0]);
     execvp(options[0], options);
 }
 
@@ -18,20 +16,16 @@ int main(){
     while(strcmp("q", string) != 0){
         
         printf("%c", '$');
-        fgets(string, 20, stdin);
-        //removing the trailing newline charcater
+        fgets(string, 20, stdin);        
         string[strcspn(string, "\n")] = '\0';
 
-        char* token = strtok(string, " "); //tokenising the strings
-        //char* command = token; //getting the command name
+        char* token = strtok(string, " "); 
         char* options[10];
         int index = 0;
         
         while(token != NULL){
-            //printf("%s\n", token);
-            //getting the options
             options[index] = token;
-            token = strtok(NULL, " "); // null is for tokeniszing the same string
+            token = strtok(NULL, " "); 
             index++;
         }
         options[index] = NULL;
@@ -45,21 +39,14 @@ int main(){
                 break;
             
             case 0:
-                //child process
+                
                 child(options);
                 break;
 
             default:
-            //waiting for the child process to be excuted
                 wait(NULL);
         
         }
-        /*
-        if(strcmp("q", string) != 0){
-            printf("\n%s command....\n", string);
-            system(string);
-        }
-        */
         
     }
 
