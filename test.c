@@ -1,79 +1,67 @@
-#include  <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <time.h>
 
-#define LOW 2
-#define HIGH 9
-
-int random_gen(){
-    srand(time(NULL));
-    int temp = rand()%((HIGH-LOW+1)+LOW);
-    return temp;
+void child(char* options[]){
+    // can use execlp but need individual strings to mention the params
+    //printf("%s\n", options[0]);
+    execvp(options[0], options);
 }
 
-int john(int value, int n){
-    if(n>=value){
-
-        value = value*random_gen();
-        printf("John process %d\n", value);
-        return value;
-    }
-}
-
-int michael(int value, int n){
-    if(n>=value){
-        value*=random_gen();
-        printf("Michael process %d\n", value);
-        return value;
-    }
-}
 
 int main(){
-    int n;
-    scanf("%d", &n);
-    int p = 1;
-    pid_t pid;
-    int fd[2];
-    pipe(fd);
+    char string[20];
+    system("pwd");
 
-    int chance = 1; 
-
-    while(!(p>=n)){
-        switch (pid = fork())
-        {
-        case -1:
-            perror("fork failure");
-            exit(EXIT_FAILURE);
-            break;
-
-        case 0:
-            p = michael(p, n);
-            chance += 1;
-            close(fd[0]); 
-            close(1);
-            dup(fd[1]);
-            write(fd[1], &p, sizeof(int));
-            break;
+    while(strcmp("q", string) != 0){
         
-        default:
-            close(fd[1]); 
-            close(0); 
-            dup(fd[0]); 
-            int n1 = read(fd[0], &p, sizeof(int));
+        printf("%c", '$');
+        fgets(string, 20, stdin);
+        //removing the trailing newline charcater
+        string[strcspn(string, "\n")] = '\0';
 
-            p = john(p, n);
-            chance+=1;
-            wait(NULL);
+        char* token = strtok(string, " "); //tokenising the strings
+        //char* command = token; //getting the command name
+        char* options[10];
+        int index = 0;
+        
+        while(token != NULL){
+            //printf("%s\n", token);
+            //getting the options
+            options[index] = token;
+            token = strtok(NULL, " "); // null is for tokeniszing the same string
+            index++;
         }
+        options[index] = NULL;
+
+        pid_t pid;
+
+        switch(pid=fork()){
+            case -1:
+                perror("fork failed");
+                exit(EXIT_FAILURE);
+                break;
+            
+            case 0:
+                //child process
+                child(options);
+                break;
+
+            default:
+            //waiting for the child process to be excuted
+                wait(NULL);
+        
+        }
+        /*
+        if(strcmp("q", string) != 0){
+            printf("\n%s command....\n", string);
+            system(string);
+        }
+        */
+        
     }
 
-    if(chance%2 == 0){
-        printf("John won\n");
-    }
-    else{
-        printf("Michale won\n");
-    }
     return 0;
 }
