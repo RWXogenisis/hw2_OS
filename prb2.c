@@ -17,7 +17,7 @@ int random_gen(){
 }
 
 int john(int value, int n){
-    if(n>=value){ //checking of the other player has reached the target
+    if(n>=value){ //checking if the other player has reached the target
 
         value = value*random_gen();
         printf("John process %d\n", value);
@@ -40,7 +40,7 @@ int michael(int value, int n){
         value*=random_gen();
         printf("Michael process %d\n", value);
 
-        if(n<value){ //checking if after multiplication of the player has reached the target
+        if(n<value){ //checking if after multiplication the current player has reached the target
             printf("Michael won the game\n");
             return (-100);
         }
@@ -63,7 +63,7 @@ int main(){
     int p1[2]; //C=>P
     int p2[2]; //P=>C
 
-    //in case the pipes are not declared
+    //in case the pipes are not able to be declared
     if (pipe(p1)==-1){
         return -1;
     }
